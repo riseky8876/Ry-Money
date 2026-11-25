@@ -22,9 +22,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Susun berkas web
+        run: |
+          mkdir -p dist
+          cp index.html dist/
+          cp manifest.webmanifest sw.js .nojekyll dist/
+          cp -r assets dist/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: .
+          path: dist
       - id: deployment
         uses: actions/deploy-pages@v4

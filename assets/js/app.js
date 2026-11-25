@@ -6,6 +6,7 @@ const sheet = document.getElementById('sheet')
 const toastEl = document.getElementById('toast')
 
 const state = S.loadState()
+const native = window.RyNative || null
 let route = 'ringkas'
 let animatedKey = ''
 let sheetSubmit = null
@@ -241,6 +242,10 @@ document.addEventListener('click', (e) => {
     return
   }
   if (act === 'export') return exportData()
+  if (act === 'import-native') {
+    if (native?.pickBackup) native.pickBackup()
+    return
+  }
   if (act === 'reset') {
     if (!confirm('Hapus SEMUA data di perangkat ini? Tindakan ini tidak bisa dibatalkan.')) return
     Object.assign(state, S.defaultState())
@@ -867,15 +872,18 @@ function txnSheet() {
 /* ---------- pengaturan ---------- */
 
 function settingsSheet() {
+  const canPick = !!native?.pickBackup
   openPanel({
     title: 'Pengaturan',
-    sub: 'Data disimpan di localStorage HP ini. Tidak ada akun, tidak ada server.',
+    sub: 'Data disimpan di perangkat ini. Tidak ada akun, tidak ada server.',
     body: `
       <div class="settings">
         <button type="button" class="btn btn-ghost btn-block" data-act="export">Unduh cadangan (JSON)</button>
-        <label class="btn btn-ghost btn-block" for="import-file">Pulihkan dari cadangan</label>
-        <input type="file" id="import-file" accept="application/json,.json" hidden>
-        <p class="hint">Cadangan berguna sebelum ganti HP atau membersihkan browser.</p>
+        ${canPick
+          ? `<button type="button" class="btn btn-ghost btn-block" data-act="import-native">Pulihkan dari cadangan</button>`
+          : `<label class="btn btn-ghost btn-block" for="import-file">Pulihkan dari cadangan</label>
+             <input type="file" id="import-file" accept="application/json,.json" hidden>`}
+        <p class="hint">Cadangan berguna sebelum ganti HP atau membersihkan data aplikasi.</p>
         <button type="button" class="btn btn-danger btn-block" data-act="reset">Hapus semua data</button>
       </div>`,
     after: (root) => {
@@ -888,7 +896,18 @@ function settingsSheet() {
 }
 
 function exportData() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' })
+  const json = JSON.stringify(state, null, 2)
+  if (native?.saveBackup) {
+    let ok = false
+    try {
+      ok = native.saveBackup(`ry-money-${F.todayISO()}.json`, json)
+    } catch (err) {
+      console.error(err)
+    }
+    toast(ok ? 'Cadangan disimpan di Download/Ry-Money.' : 'Gagal menyimpan cadangan.')
+    return
+  }
+  const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -900,23 +919,27 @@ function exportData() {
   toast('Cadangan diunduh.')
 }
 
+function applyBackup(text) {
+  try {
+    const data = JSON.parse(String(text))
+    if (!data || !Array.isArray(data.incomes) || !Array.isArray(data.txns)) {
+      throw new Error('bukan berkas cadangan Ry-Money')
+    }
+    Object.assign(state, S.defaultState(), data)
+    persist()
+    sheet.close()
+    render()
+    toast('Data dipulihkan.')
+    return true
+  } catch (err) {
+    alert(`Berkas tidak dikenali: ${err.message}`)
+    return false
+  }
+}
+
 function importData(file) {
   const reader = new FileReader()
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(String(reader.result))
-      if (!data || !Array.isArray(data.incomes) || !Array.isArray(data.txns)) {
-        throw new Error('bukan berkas cadangan Ry-Money')
-      }
-      Object.assign(state, S.defaultState(), data)
-      persist()
-      sheet.close()
-      render()
-      toast('Data dipulihkan.')
-    } catch (err) {
-      alert(`Berkas tidak dikenali: ${err.message}`)
-    }
-  }
+  reader.onload = () => applyBackup(String(reader.result))
   reader.readAsText(file)
 }
 
@@ -943,6 +966,16 @@ function animateBalance() {
 }
 
 /* ---------- mulai ---------- */
+
+// Jembatan kecil untuk pembungkus Android (APK).
+window.__ryBack = () => {
+  if (sheet.open) {
+    sheet.close()
+    return true
+  }
+  return false
+}
+window.__ryRestore = (text) => applyBackup(text)
 
 let resizeTimer
 window.addEventListener('resize', () => {

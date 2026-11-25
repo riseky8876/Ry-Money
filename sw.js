@@ -1,4 +1,4 @@
-const CACHE = 'rymoney-v1'
+const CACHE = 'rymoney-v2'
 const SHELL = [
   './',
   './index.html',
@@ -8,6 +8,9 @@ const SHELL = [
   './assets/js/format.js',
   './manifest.webmanifest',
   './assets/icon.svg',
+  './assets/fonts/fraunces.woff2',
+  './assets/fonts/karla.woff2',
+  './assets/fonts/jbm.woff2',
 ]
 
 self.addEventListener('install', (event) => {
