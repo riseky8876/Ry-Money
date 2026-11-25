@@ -1,0 +1,7 @@
+# alat lokal, bukan bagian aplikasi
+/ponytail/
+/my-frontend-design-skill/
+/.opencode/
+/opencode.json
+*.bak
+.DS_Store
