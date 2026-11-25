@@ -171,7 +171,7 @@ class CatatanScreen extends StatelessWidget {
                           Text(
                             '${group.net < 0 ? '−' : '+'}${fmtRp(group.net.abs())}',
                             style: T.mono(
-                              10.5,
+                              11.5,
                               color: group.net < 0 ? R.muted : R.acid,
                               letter: -0.1,
                             ),
@@ -257,7 +257,7 @@ class _TxnRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   txn.category.isEmpty ? 'Lainnya' : txn.category,
-                  style: T.body(11, color: R.muted),
+                  style: T.body(11.5, color: R.muted),
                 ),
               ],
             ),

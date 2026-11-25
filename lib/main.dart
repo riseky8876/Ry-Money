@@ -17,10 +17,10 @@ void main() {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
       systemNavigationBarColor: R.ink,
-      systemNavigationBarIconBrightness: Brightness.light,
+      systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
   runApp(RyApp(store: RyStore()..load()));
@@ -67,7 +67,6 @@ class _LoadingScreen extends StatelessWidget {
       backgroundColor: R.ink,
       body: Stack(
         children: <Widget>[
-          const Positioned.fill(child: Atmosphere()),
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -78,7 +77,7 @@ class _LoadingScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'menyiapkan buku kas…',
-                  style: T.mono(10, color: R.muted, letter: 0.6),
+                  style: T.mono(12, color: R.muted, letter: 0.4),
                 ),
               ],
             ),
@@ -208,7 +207,7 @@ class _HomeShellState extends State<_HomeShell> {
                   monthShortLabel(store.state.month).toUpperCase(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: T.mono(9, color: R.paperDim, letter: 0.3),
+                  style: T.mono(11.5, color: R.paperDim, letter: 0.3),
                 ),
               ),
             ),
@@ -233,12 +232,7 @@ class _HomeShellState extends State<_HomeShell> {
           child: Container(height: 1, color: R.line),
         ),
       ),
-      body: Stack(
-        children: <Widget>[
-          const Positioned.fill(child: Atmosphere()),
-          IndexedStack(index: _index, children: screens),
-        ],
-      ),
+      body: IndexedStack(index: _index, children: screens),
       bottomNavigationBar: _TabBar(index: _index, onTap: _goTo),
     );
   }
@@ -412,17 +406,16 @@ class _TabItem extends StatelessWidget {
                 children: <Widget>[
                   Icon(
                     active ? spec.activeIcon : spec.icon,
-                    size: 19,
+                    size: 21,
                     color: active ? R.acid : R.muted,
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 4),
                   Text(
-                    spec.label.toUpperCase(),
-                    style: T.mono(
-                      8.5,
+                    spec.label,
+                    style: T.body(
+                      11,
                       color: active ? R.acid : R.muted,
-                      letter: 0.7,
-                      weight: active ? FontWeight.w600 : FontWeight.w400,
+                      weight: active ? FontWeight.w600 : FontWeight.w500,
                     ),
                   ),
                 ],

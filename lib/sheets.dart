@@ -811,7 +811,7 @@ class _SettingsBody extends StatelessWidget {
               child: SingleChildScrollView(
                 child: SelectableText(
                   json,
-                  style: T.mono(10, color: R.paperDim, height: 1.5),
+                  style: T.mono(11.5, color: R.paperDim, height: 1.5),
                 ),
               ),
             ),
@@ -906,7 +906,7 @@ class _SettingsBody extends StatelessWidget {
         const SizedBox(height: 18),
         Text(
           'Ry-Money · data lokal, tanpa iklan, tanpa internet.',
-          style: T.mono(10, color: R.muted, letter: 0.4),
+          style: T.mono(11.5, color: R.muted, letter: 0.4),
         ),
       ],
     );
@@ -947,11 +947,11 @@ Future<String?> _showRestoreDialog(BuildContext context, RyStore store) {
                       maxLines: null,
                       expands: true,
                       textAlignVertical: TextAlignVertical.top,
-                      style: T.mono(10.5, height: 1.5),
+                      style: T.mono(12, height: 1.5),
                       cursorColor: R.acid,
                       decoration: InputDecoration(
                         hintText: '{"version":2, …}',
-                        hintStyle: T.mono(10.5, color: R.muted),
+                        hintStyle: T.mono(12, color: R.muted),
                         filled: true,
                         fillColor: R.ink3,
                         contentPadding: const EdgeInsets.all(10),

@@ -112,7 +112,7 @@ class TabunganScreen extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     '${fmtRp(monthlyAuto)} per bulan dipotong otomatis dari gaji.',
-                    style: T.mono(10, color: R.muted, height: 1.5),
+                    style: T.mono(11.5, color: R.muted, height: 1.5),
                   ),
                 ],
               ],
@@ -242,14 +242,14 @@ class _GoalCard extends StatelessWidget {
           const SizedBox(height: 9),
           Text(
             'Rencana ${fmtRp(goal.planAmount)} ${goal.rhythmLabel}',
-            style: T.mono(10, color: R.muted, height: 1.5, letter: -0.1),
+            style: T.mono(11.5, color: R.muted, height: 1.5, letter: -0.1),
           ),
           const SizedBox(height: 2),
           Text(
             goal.done
                 ? 'target tercapai'
                 : '${fmtRp(goal.remaining)} lagi · ${etaLabel(goal.daysLeft)}',
-            style: T.mono(10, color: R.muted, height: 1.5, letter: -0.1),
+            style: T.mono(11.5, color: R.muted, height: 1.5, letter: -0.1),
           ),
           const SizedBox(height: 12),
           ToggleRow(

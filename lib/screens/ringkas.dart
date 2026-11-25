@@ -25,16 +25,6 @@ class RingkasScreen extends StatelessWidget {
     final planned = active.fold<double>(0, (sum, r) => sum + r.monthly);
     final inflow = totals.inflow;
     final over = totals.available < 0;
-    final whole = inflow > 0
-        ? ((totals.available < 0 ? 0 : totals.available) / inflow * 100)
-            .round()
-            .clamp(0, 100)
-        : 0;
-
-    double share(double value) {
-      if (inflow <= 0) return 0;
-      return (value / inflow * 100).clamp(0, 100).toDouble();
-    }
 
     final recent = state.txns
         .where((txn) => inMonth(txn.date, month))
@@ -64,12 +54,7 @@ class RingkasScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Eyebrow('Buku kas · ${monthLabel(month)}'),
-          const SizedBox(height: 8),
-          Text(
-            'Uangmu,\ndalam satu garis.',
-            style: T.display(38, height: 0.98, letter: -0.045),
-          ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.only(top: 6, bottom: 18),
             decoration: const BoxDecoration(
@@ -78,27 +63,17 @@ class RingkasScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Stack(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Eyebrow('Sisa bisa dipakai'),
-                        const SizedBox(height: 10),
-                        BalanceFigure(totals.available),
-                        const SizedBox(height: 10),
-                        Text(
-                          note,
-                          style: T.body(13, color: R.muted, height: 1.4),
-                        ),
-                      ],
+                    Eyebrow('Sisa bisa dipakai'),
+                    const SizedBox(height: 10),
+                    BalanceFigure(totals.available),
+                    const SizedBox(height: 10),
+                    Text(
+                      note,
+                      style: T.body(13, color: R.muted, height: 1.4),
                     ),
-                    if (inflow > 0)
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Stamp('$whole% utuh'),
-                      ),
                   ],
                 ),
                 const SizedBox(height: 18),
@@ -108,30 +83,6 @@ class RingkasScreen extends StatelessWidget {
                     SplitPart(R.save, totals.saved),
                     SplitPart(R.spend, totals.spent),
                     SplitPart(R.acid, totals.available < 0 ? 0 : totals.available),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 6,
-                  children: <Widget>[
-                    _LegendItem(
-                      color: R.olive,
-                      label: 'Penyisihan ${share(totals.allocated).round()}%',
-                    ),
-                    _LegendItem(
-                      color: R.save,
-                      label: 'Tabungan ${share(totals.saved).round()}%',
-                    ),
-                    _LegendItem(
-                      color: R.spend,
-                      label: 'Belanja ${share(totals.spent).round()}%',
-                    ),
-                    _LegendItem(
-                      color: R.acid,
-                      label: 'Sisa '
-                          '${share(totals.available < 0 ? 0 : totals.available).round()}%',
-                    ),
                   ],
                 ),
               ],
@@ -217,12 +168,12 @@ class RingkasScreen extends StatelessWidget {
                       children: <Widget>[
                         Text(
                           '${fmtRp(goal.saved)} / ${fmtRp(goal.target)}',
-                          style: T.mono(10.5, color: R.muted, letter: -0.1),
+                          style: T.mono(11.5, color: R.muted, letter: -0.1),
                         ),
                         const Spacer(),
                         Text(
                           etaLabel(goal.daysLeft),
-                          style: T.mono(10.5, color: R.muted, letter: -0.1),
+                          style: T.mono(11.5, color: R.muted, letter: -0.1),
                         ),
                       ],
                     ),
@@ -251,29 +202,10 @@ class RingkasScreen extends StatelessWidget {
           const SizedBox(height: 26),
           Text(
             'Data tersimpan di HP ini. Cadangkan dari tombol pengaturan di atas.',
-            style: T.mono(9.5, color: R.muted, height: 1.6, letter: 0.2),
+            style: T.mono(11.5, color: R.muted, height: 1.6, letter: 0.2),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _LegendItem extends StatelessWidget {
-  const _LegendItem({required this.color, required this.label});
-
-  final Color color;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Container(width: 8, height: 8, color: color),
-        const SizedBox(width: 7),
-        Text(label, style: T.body(12, color: R.muted)),
-      ],
     );
   }
 }

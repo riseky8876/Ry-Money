@@ -6,58 +6,6 @@ import 'package:flutter/services.dart';
 import 'format.dart';
 import 'theme.dart';
 
-/* ---------- latar ---------- */
-
-class Atmosphere extends StatelessWidget {
-  const Atmosphere({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Stack(
-        children: <Widget>[
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(1.05, -1.0),
-                  radius: 1.15,
-                  colors: <Color>[R.acid.withAlpha(18), Colors.transparent],
-                  stops: const <double>[0.0, 0.75],
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(-1.15, 0.05),
-                  radius: 1.0,
-                  colors: <Color>[R.rust.withAlpha(11), Colors.transparent],
-                  stops: const <double>[0.0, 0.7],
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0.1, 1.25),
-                  radius: 1.1,
-                  colors: <Color>[R.olive.withAlpha(16), Colors.transparent],
-                  stops: const <double>[0.0, 0.8],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /* ---------- teks ---------- */
 
 class Eyebrow extends StatelessWidget {
@@ -91,8 +39,8 @@ class TextLink extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
           child: Text(
-            label.toUpperCase(),
-            style: T.mono(10.5, color: R.acid, weight: FontWeight.w600, letter: 1.2),
+            label,
+            style: T.body(13, color: R.acid, weight: FontWeight.w600),
           ),
         ),
       ),
@@ -153,7 +101,7 @@ class Stamp extends StatelessWidget {
         decoration: BoxDecoration(border: Border.all(color: color.withAlpha(120))),
         child: Text(
           text.toUpperCase(),
-          style: T.mono(9.5, color: color, weight: FontWeight.w600, letter: 1.5),
+          style: T.mono(11, color: color, weight: FontWeight.w600, letter: 0.8),
         ),
       ),
     );
@@ -442,12 +390,11 @@ class RyButton extends StatelessWidget {
           Icon(icon, size: small ? 15 : 17, color: foreground),
         if (busy || icon != null) const SizedBox(width: 7),
         Text(
-          label.toUpperCase(),
-          style: T.mono(
-            small ? 10.5 : 12,
+          label,
+          style: T.body(
+            small ? 12 : 13.5,
             color: foreground,
             weight: FontWeight.w600,
-            letter: 1.0,
           ),
         ),
       ],
@@ -590,7 +537,7 @@ class RyField extends StatelessWidget {
       children: <Widget>[
         Text(
           label.toUpperCase(),
-          style: T.mono(9.5, color: R.muted, weight: FontWeight.w600, letter: 1.4),
+          style: T.mono(11.5, color: R.muted, weight: FontWeight.w600, letter: 0.4),
         ),
         const SizedBox(height: 6),
         child,
@@ -768,7 +715,7 @@ class RyDateField extends StatelessWidget {
       builder: (ctx, child) {
         return Theme(
           data: Theme.of(ctx).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: const ColorScheme.light(
               primary: R.acid,
               onPrimary: R.acidInk,
               surface: R.ink2,
@@ -894,7 +841,7 @@ class MoneyChip extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: T.mono(10.5, color: R.paperDim, letter: 0.3),
+            style: T.mono(12, color: R.paperDim, letter: 0.2),
           ),
         ),
       ),
@@ -1067,7 +1014,7 @@ class InfoLine extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: T.mono(10.5, color: R.acid, height: 1.5, letter: -0.1),
+        style: T.mono(12, color: R.acid, height: 1.5, letter: -0.1),
       ),
     );
   }

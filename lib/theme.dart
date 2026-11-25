@@ -1,4 +1,10 @@
-// Token desain: tinta hangat, kertas, satu aksen hijau asam.
+// Token desain — arah "Nordic calm": kertas terang, netral hangat,
+// satu aksen hijau tenang, dan ruang kosong yang lega.
+//
+// Catatan penting: nama token dipertahankan agar seluruh pemakaian di
+// layar tetap valid, tapi maknanya sudah dibalik untuk tema terang —
+//   `ink*`  = permukaan (latar)
+//   `paper` = teks utama
 
 import 'dart:ui' show FontFeature;
 
@@ -7,19 +13,24 @@ import 'package:flutter/material.dart';
 class R {
   R._();
 
-  static const ink = Color(0xFF0A0B08);
-  static const ink2 = Color(0xFF101208);
-  static const ink3 = Color(0xFF171A10);
-  static const line = Color(0xFF24281B);
-  static const line2 = Color(0xFF333827);
-  static const paper = Color(0xFFEFEDE3);
-  static const paperDim = Color(0xFFCFCEBE);
-  static const muted = Color(0xFF8C8E7C);
-  static const acid = Color(0xFFC8F751);
-  static const acidInk = Color(0xFF10130A);
-  static const rust = Color(0xFFFF6A3D);
-  static const olive = Color(0xFF6F7C3E);
-  static const save = Color(0xFF9FBF48);
+  // Permukaan.
+  static const ink = Color(0xFFF4F3EE);
+  static const ink2 = Color(0xFFFDFCFA);
+  static const ink3 = Color(0xFFECEBE4);
+  static const line = Color(0xFFE2E1D8);
+  static const line2 = Color(0xFFCDCBC0);
+
+  // Teks.
+  static const paper = Color(0xFF1B1D16);
+  static const paperDim = Color(0xFF5A5D52);
+  static const muted = Color(0xFF6E7165);
+
+  // Aksen tunggal — hijau tenang, bukan hijau asam.
+  static const acid = Color(0xFF2F6B3F);
+  static const acidInk = Color(0xFFF3F7EF);
+  static const rust = Color(0xFFBE4318);
+  static const olive = Color(0xFFA88A2E);
+  static const save = Color(0xFF4E8C3F);
   static const spend = Color(0xFFB2451F);
 }
 
@@ -86,44 +97,45 @@ class T {
     );
   }
 
+  /// Label seksi. Sengaja tidak teriak: huruf kecil, tracking ringan.
   static TextStyle eyebrow({Color color = R.muted}) => mono(
-        10.5,
+        11.5,
         color: color,
-        letter: 1.7,
+        letter: 0.8,
         height: 1.2,
         weight: FontWeight.w600,
       );
 }
 
 ThemeData ryTheme() {
-  final base = ThemeData(brightness: Brightness.dark, useMaterial3: true);
+  final base = ThemeData(brightness: Brightness.light, useMaterial3: true);
   return base.copyWith(
     scaffoldBackgroundColor: R.ink,
     canvasColor: R.ink,
-    colorScheme: const ColorScheme.dark(
+    colorScheme: const ColorScheme.light(
       primary: R.acid,
       onPrimary: R.acidInk,
       secondary: R.rust,
-      onSecondary: R.ink,
+      onSecondary: R.acidInk,
       surface: R.ink2,
       onSurface: R.paper,
       error: R.rust,
-      onError: R.ink,
+      onError: R.acidInk,
     ),
-    splashColor: R.acid.withAlpha(20),
+    splashColor: R.acid.withAlpha(26),
     highlightColor: Colors.transparent,
     textSelectionTheme: const TextSelectionThemeData(
       cursorColor: R.acid,
-      selectionColor: Color(0x55C8F751),
+      selectionColor: Color(0x332F6B3F),
       selectionHandleColor: R.acid,
     ),
     snackBarTheme: const SnackBarThemeData(
-      backgroundColor: R.acid,
+      backgroundColor: R.paper,
       contentTextStyle: TextStyle(
         fontFamily: T.bodyFamily,
         fontSize: 13.5,
         fontWeight: FontWeight.w600,
-        color: R.acidInk,
+        color: R.ink,
       ),
     ),
   );

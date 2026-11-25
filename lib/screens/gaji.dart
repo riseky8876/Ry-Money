@@ -395,7 +395,7 @@ class _SalaryFormState extends State<_SalaryForm> {
               padding: const EdgeInsets.only(top: 9),
               child: Text(
                 'Dua tombol di atas bisa dimatikan kapan saja. Tabungan otomatis juga bisa diatur per target.',
-                style: T.body(11, color: R.muted, height: 1.45),
+                style: T.body(11.5, color: R.muted, height: 1.45),
               ),
             ),
         ],
