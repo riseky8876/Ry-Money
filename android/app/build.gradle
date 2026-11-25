@@ -4,7 +4,7 @@ plugins {
 
 def ksPath = System.getenv('RY_KEYSTORE')
 def ksPass = System.getenv('RY_STOREPASS')
-def keyAlias = System.getenv('RY_KEYALIAS') ?: 'rymoney'
+def aliasName = System.getenv('RY_KEYALIAS') ?: 'rymoney'
 
 android {
     namespace 'app.rymoney'
@@ -23,7 +23,7 @@ android {
             if (ksPath) {
                 storeFile file(ksPath)
                 storePassword ksPass
-                keyAlias keyAlias
+                keyAlias aliasName
                 keyPassword System.getenv('RY_KEYPASS') ?: ksPass
                 storeType 'PKCS12'
             }
