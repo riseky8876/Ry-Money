@@ -49,7 +49,23 @@ function render() {
   }
   attachMoney(app)
   wireSalaryForm()
+  fitFigures()
   animateBalance()
+}
+
+// Angka rupiah panjang tidak boleh pecah baris: kecilkan font sampai pas.
+function fitFigures() {
+  document.querySelectorAll('.balance-figure').forEach((el) => {
+    el.style.fontSize = ''
+    const avail = el.parentElement?.clientWidth || 0
+    if (!avail) return
+    let size = parseFloat(window.getComputedStyle(el).fontSize) || 48
+    let guard = 0
+    while (el.scrollWidth > avail && size > 24 && guard++ < 40) {
+      size -= 2
+      el.style.fontSize = `${size}px`
+    }
+  })
 }
 
 /* ---------- input nominal ---------- */
@@ -927,6 +943,12 @@ function animateBalance() {
 }
 
 /* ---------- mulai ---------- */
+
+let resizeTimer
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer)
+  resizeTimer = setTimeout(fitFigures, 150)
+})
 
 setRoute()
 
