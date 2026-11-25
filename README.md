@@ -6,9 +6,12 @@ Buku kas pribadi dalam bentuk aplikasi Android asli (Flutter). Ikon sendiri di l
 
 ## Pasang
 
-1. Buka tautan di atas dari HP, unduh `Ry-Money.apk`.
-2. Ketuk berkasnya → izinkan **instal dari sumber tidak dikenal** untuk aplikasi yang membukanya (Chrome/Files).
-3. Selesai. Ikon Ry-Money muncul di laci aplikasi.
+1. Buka tautan di atas dari HP, unduh `Ry-Money.apk` (arm64, dipakai hampir semua HP sekarang).
+2. Kalau muncul *"aplikasi tidak kompatibel"* di HP lama, unduh `Ry-Money-32bit.apk` dari halaman rilis yang sama.
+3. Ketuk berkasnya → izinkan **instal dari sumber tidak dikenal** untuk aplikasi yang membukanya (Chrome/Files).
+4. Selesai. Ikon Ry-Money muncul di laci aplikasi.
+
+Ukuran APK sekitar 20 MB (arm64) atau 19 MB (32-bit) — Flutter membawa mesin render sendiri, jadi lebih besar dari versi web dulu.
 
 Memperbarui: unduh APK terbaru dan pasang di atas yang lama. Data tidak hilang selama APK ditandatangani dengan kunci yang sama.
 

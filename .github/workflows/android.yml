@@ -64,6 +64,7 @@ jobs:
       - name: Bangun APK
         run: |
           flutter build apk --release \
+            --split-per-abi \
             --build-name="1.1.${GITHUB_RUN_NUMBER}" \
             --build-number="$((1000 + GITHUB_RUN_NUMBER))"
 
@@ -71,15 +72,22 @@ jobs:
         run: |
           APKSIGNER="$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}/build-tools" -name apksigner -type f | sort | tail -1)"
           test -n "$APKSIGNER"
-          "$APKSIGNER" verify --print-certs build/app/outputs/flutter-apk/app-release.apk
+          "$APKSIGNER" verify --print-certs \
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 
       - name: Siapkan berkas
-        run: cp build/app/outputs/flutter-apk/app-release.apk Ry-Money.apk
+        run: |
+          cd build/app/outputs/flutter-apk
+          cp app-arm64-v8a-release.apk "$GITHUB_WORKSPACE/Ry-Money.apk"
+          cp app-armeabi-v7a-release.apk "$GITHUB_WORKSPACE/Ry-Money-32bit.apk"
+          ls -lh "$GITHUB_WORKSPACE"/*.apk
 
       - uses: actions/upload-artifact@v4
         with:
           name: Ry-Money-apk
-          path: Ry-Money.apk
+          path: |
+            Ry-Money.apk
+            Ry-Money-32bit.apk
 
       - name: Terbitkan ke Releases
         env:
@@ -88,6 +96,6 @@ jobs:
           gh release view apk-latest >/dev/null 2>&1 || \
             gh release create apk-latest \
               --title "Ry-Money APK" \
-              --notes "APK Flutter terbaru Ry-Money. Unduh Ry-Money.apk lalu pasang di HP. Data tinggal di HP, tanpa akun dan tanpa internet." \
+              --notes "APK Flutter terbaru Ry-Money. Unduh Ry-Money.apk (arm64, hampir semua HP) atau Ry-Money-32bit.apk untuk HP lama. Data tinggal di HP, tanpa akun dan tanpa internet." \
               --latest
-          gh release upload apk-latest Ry-Money.apk --clobber
+          gh release upload apk-latest Ry-Money.apk Ry-Money-32bit.apk --clobber
