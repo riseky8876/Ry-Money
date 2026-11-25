@@ -11,7 +11,7 @@ Buku kas pribadi dalam bentuk aplikasi Android asli (Flutter). Ikon sendiri di l
 3. Ketuk berkasnya → izinkan **instal dari sumber tidak dikenal** untuk aplikasi yang membukanya (Chrome/Files).
 4. Selesai. Ikon Ry-Money muncul di laci aplikasi.
 
-Ukuran APK sekitar 20 MB (arm64) atau 19 MB (32-bit) — Flutter membawa mesin render sendiri, jadi lebih besar dari versi web dulu.
+Ukuran APK sekitar 18 MB (arm64) atau 16 MB (32-bit) — Flutter membawa mesin render sendiri, jadi lebih besar dari versi web dulu.
 
 Memperbarui: unduh APK terbaru dan pasang di atas yang lama. Data tidak hilang selama APK ditandatangani dengan kunci yang sama.
 
