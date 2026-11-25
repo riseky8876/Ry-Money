@@ -68,3 +68,15 @@ Membangun APK secara lokal butuh JDK 17 + Android SDK:
 ```bash
 gradle -p android assembleRelease
 ```
+
+### Penandatanganan
+
+APK ditandatangani dengan kunci rilis yang tersimpan sebagai secret repo (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`). Salinan lokal ada di `android/keystore.p12` dan `android/KEYSTORE.txt` — keduanya di-`.gitignore`.
+
+Kalau kunci ini hilang, APK berikutnya tidak bisa dipasang menimpa versi lama (harus uninstal dulu). Simpan `android/KEYSTORE.txt` di tempat aman.
+
+Verifikasi APK yang sudah dibangun:
+
+```bash
+apksigner verify --print-certs Ry-Money.apk
+```
