@@ -3,19 +3,17 @@ name: Build APK
 on:
   push:
     branches: [main]
-    paths:
-      - 'android/**'
-      - 'assets/**'
-      - 'index.html'
-      - 'manifest.webmanifest'
-      - '.github/workflows/android.yml'
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: apk
+  cancel-in-progress: true
+
 jobs:
-  apk:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -25,9 +23,22 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: subosito/flutter-action@v2
         with:
-          gradle-version: '8.9'
+          channel: stable
+          cache: true
+
+      - name: Versi Flutter
+        run: flutter --version
+
+      - name: Ambil dependensi
+        run: flutter pub get
+
+      - name: Analisis
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: Tes
+        run: flutter test
 
       - name: Siapkan keystore
         env:
@@ -35,26 +46,35 @@ jobs:
           KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KS_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          if [ -n "$KS_B64" ]; then
-            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/rymoney.p12"
-            {
-              echo "RY_KEYSTORE=$RUNNER_TEMP/rymoney.p12"
-              echo "RY_STOREPASS=$KS_PASS"
-              echo "RY_KEYPASS=$KS_PASS"
-              echo "RY_KEYALIAS=$KS_ALIAS"
-            } >> "$GITHUB_ENV"
-          else
-            echo "::warning::Secret keystore kosong — APK akan ditandatangani dengan kunci debug."
+          if [ -z "$KS_B64" ]; then
+            echo "::error::Secret ANDROID_KEYSTORE_BASE64 kosong; APK tidak bisa menimpa instalasi lama."
+            exit 1
           fi
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/rymoney.p12"
+          {
+            echo "RY_KEYSTORE=$RUNNER_TEMP/rymoney.p12"
+            echo "RY_STOREPASS=$KS_PASS"
+            echo "RY_KEYPASS=$KS_PASS"
+            echo "RY_KEYALIAS=$KS_ALIAS"
+          } >> "$GITHUB_ENV"
 
-      - name: Build APK
-        env:
-          RY_VERSION_CODE: ${{ github.run_number }}
-          RY_VERSION_NAME: 1.0.${{ github.run_number }}
-        run: gradle -p android assembleRelease --no-daemon --stacktrace
+      - name: Siapkan Android
+        run: python3 tool/patch_android.py
+
+      - name: Bangun APK
+        run: |
+          flutter build apk --release \
+            --build-name="1.1.${GITHUB_RUN_NUMBER}" \
+            --build-number="$((1000 + GITHUB_RUN_NUMBER))"
+
+      - name: Periksa tanda tangan
+        run: |
+          APKSIGNER="$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}/build-tools" -name apksigner -type f | sort | tail -1)"
+          test -n "$APKSIGNER"
+          "$APKSIGNER" verify --print-certs build/app/outputs/flutter-apk/app-release.apk
 
       - name: Siapkan berkas
-        run: cp android/app/build/outputs/apk/release/app-release.apk Ry-Money.apk
+        run: cp build/app/outputs/flutter-apk/app-release.apk Ry-Money.apk
 
       - uses: actions/upload-artifact@v4
         with:
@@ -68,6 +88,6 @@ jobs:
           gh release view apk-latest >/dev/null 2>&1 || \
             gh release create apk-latest \
               --title "Ry-Money APK" \
-              --notes "APK terbaru Ry-Money. Unduh Ry-Money.apk, lalu pasang di HP (izinkan instal dari sumber tidak dikenal). Data tersimpan di HP, bukan di server." \
+              --notes "APK Flutter terbaru Ry-Money. Unduh Ry-Money.apk lalu pasang di HP. Data tinggal di HP, tanpa akun dan tanpa internet." \
               --latest
           gh release upload apk-latest Ry-Money.apk --clobber

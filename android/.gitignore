@@ -1,8 +1,0 @@
-# Android
-.gradle/
-build/
-local.properties
-*.p12
-*.jks
-*.keystore
-src/main/assets/www/

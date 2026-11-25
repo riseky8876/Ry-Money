@@ -7,4 +7,19 @@
 .DS_Store
 
 # rahasia lokal
-android/KEYSTORE.txt
+keys/
+*.p12
+*.jks
+*.keystore
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+/build/
+/android/
+*.iml
+
+# Android lokal
+.gradle/
+local.properties
