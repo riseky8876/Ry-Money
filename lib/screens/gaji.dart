@@ -61,8 +61,13 @@ class GajiScreen extends StatelessWidget {
         .where((income) => inMonth(income.date, month))
         .toList()
       ..sort((a, b) => b.date.compareTo(a.date));
-    final monthIncome =
-        incomes.fold<double>(0, (sum, income) => sum + income.amount);
+    // Angka yang tampil = bersih (kotor dikurangi penyisihan), supaya benar
+    // terlihat berkurang saat rutinitas/target dipotong.
+    final monthIncome = incomes.fold<double>(0, (sum, income) {
+      final net =
+          income.amount - income.allocatedRoutine - income.allocatedSaving;
+      return sum + net;
+    });
 
     return SingleChildScrollView(
       key: const PageStorageKey<String>('gaji'),
@@ -118,7 +123,7 @@ class GajiScreen extends StatelessWidget {
                 onDelete: () => _deleteRoutine(context, routine),
               ),
           SectionHead(
-            title: 'Gaji bulan ini',
+            title: 'Gaji bersih bulan ini',
             trailing: fmtRp(monthIncome),
           ),
           const SizedBox(height: 6),
@@ -481,10 +486,12 @@ class _IncomeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final cut = income.allocatedRoutine;
     final saved = income.allocatedSaving;
+    final net = income.amount - cut - saved;
     final parts = <String>[
       fmtDate(income.date),
-      if (cut > 0) 'rutin ${fmtRp(cut)}',
-      if (saved > 0) 'tabungan ${fmtRp(saved)}',
+      if (cut > 0 || saved > 0) 'dari ${fmtRp(income.amount)}',
+      if (cut > 0) 'rutin −${fmtRp(cut)}',
+      if (saved > 0) 'tabungan −${fmtRp(saved)}',
     ];
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 9),
@@ -514,7 +521,7 @@ class _IncomeRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(fmtRp(income.amount), style: T.mono(12.5)),
+          Text(fmtRp(net), style: T.mono(12.5)),
           RyIconButton(
             icon: Icons.close_rounded,
             onTap: onDelete,
