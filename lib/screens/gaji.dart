@@ -111,6 +111,7 @@ class GajiScreen extends StatelessWidget {
                 routine: routine,
                 onToggle: (value) {
                   routine.active = value;
+                  applyPendingSalaryDeductions(store.state);
                   store.changed();
                 },
                 onEdit: () => _editRoutine(context, routine),
@@ -224,6 +225,8 @@ class _SalaryFormState extends State<_SalaryForm> {
         label: label.isEmpty ? 'Gaji' : label,
         amount: amount,
         allocations: plan.allocations,
+        cutRoutine: _cutRoutine,
+        saveGoals: _saveGoals,
       ),
     );
     widget.store.state.month = monthOf(_date);

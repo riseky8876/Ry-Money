@@ -125,6 +125,8 @@ class _RoutineFormState extends State<_RoutineForm> {
       );
     }
 
+    applyPendingSalaryDeductions(widget.store.state);
+
     final ok = await widget.store.save();
     if (!mounted) return;
     if (!ok) {
@@ -348,6 +350,8 @@ class _GoalFormState extends State<_GoalForm> {
         ),
       );
     }
+
+    applyPendingSalaryDeductions(widget.store.state);
 
     final ok = await widget.store.save();
     if (!mounted) return;

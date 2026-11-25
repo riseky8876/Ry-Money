@@ -333,4 +333,102 @@ void main() {
       expect(copy.goals.first.planPeriod, 'custom');
     });
   });
+
+  group('potongan menyusul ke gaji terakhir', () {
+    test('rutinitas aktif setelah gaji dicatat ikut terpotong', () {
+      final state = AppState(
+        month: '2026-11',
+        incomes: <Income>[
+          Income(
+            id: 'i1',
+            date: '2026-11-05',
+            label: 'Gaji',
+            amount: 5000000,
+          ),
+        ],
+        routines: <Routine>[Routine(id: 'r1', name: 'Kos', amount: 700000)],
+      );
+
+      applyPendingSalaryDeductions(state);
+
+      final income = state.incomes.first;
+      expect(income.allocations, hasLength(1));
+      expect(income.allocatedRoutine, 700000);
+      expect(monthTotals(state, '2026-11').allocated, 700000);
+
+      // dipanggil ulang tidak menggandakan
+      applyPendingSalaryDeductions(state);
+      expect(income.allocations, hasLength(1));
+    });
+
+    test('target tabungan menyusul menambah alokasi dan setoran', () {
+      final goal = makeGoal(id: 'g1', autoDeduct: true);
+      final state = AppState(
+        month: '2026-11',
+        incomes: <Income>[
+          Income(
+            id: 'i1',
+            date: '2026-11-05',
+            label: 'Gaji',
+            amount: 8000000,
+          ),
+        ],
+        goals: <Goal>[goal],
+      );
+
+      applyPendingSalaryDeductions(state);
+
+      expect(state.incomes.first.allocatedSaving, 304375);
+      expect(goal.deposits, hasLength(1));
+      expect(goal.deposits.first.incomeId, 'i1');
+      expect(goal.saved, 304375);
+    });
+
+    test('sakelar yang dimatikan saat mencatat gaji tidak disentuh', () {
+      final state = AppState(
+        month: '2026-11',
+        incomes: <Income>[
+          Income(
+            id: 'i1',
+            date: '2026-11-05',
+            label: 'Gaji',
+            amount: 5000000,
+            cutRoutine: false,
+            saveGoals: false,
+          ),
+        ],
+        routines: <Routine>[Routine(id: 'r1', name: 'Kos', amount: 700000)],
+        goals: <Goal>[makeGoal(id: 'g1', autoDeduct: true)],
+      );
+
+      applyPendingSalaryDeductions(state);
+
+      expect(state.incomes.first.allocations, isEmpty);
+      expect(state.goals.first.deposits, isEmpty);
+    });
+
+    test('rutinitas nonaktif dan gaji bulan lain tidak ikut', () {
+      final state = AppState(
+        month: '2026-11',
+        incomes: <Income>[
+          Income(
+            id: 'i1',
+            date: '2026-10-05',
+            label: 'Gaji Oktober',
+            amount: 5000000,
+          ),
+        ],
+        routines: <Routine>[
+          Routine(id: 'r1', name: 'Kos', amount: 700000, active: false),
+          Routine(id: 'r2', name: 'Gym', amount: 100000),
+        ],
+      );
+
+      applyPendingSalaryDeductions(state);
+
+      // hanya gaji bulan ini yang boleh disentuh; Oktober tetap kosong
+      expect(state.incomes.first.allocations, isEmpty);
+      expect(state.incomes, hasLength(1));
+    });
+  });
 }

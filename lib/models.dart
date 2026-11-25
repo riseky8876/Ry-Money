@@ -323,6 +323,8 @@ class Income {
     required this.amount,
     List<Allocation>? allocations,
     int? createdAt,
+    this.cutRoutine = true,
+    this.saveGoals = true,
   })  : allocations = allocations ?? <Allocation>[],
         createdAt = createdAt ?? DateTime.now().millisecondsSinceEpoch;
 
@@ -332,6 +334,13 @@ class Income {
   double amount;
   final List<Allocation> allocations;
   final int createdAt;
+
+  /// Sakelar "Potong penyisihan" saat gaji ini dicatat. Potongan menyusul
+  /// hanya mengisi gaji yang sakelarnya hidup.
+  bool cutRoutine;
+
+  /// Sakelar "Sisihkan tabungan" saat gaji ini dicatat.
+  bool saveGoals;
 
   double get allocatedRoutine => allocations
       .where((a) => !a.isSaving)
@@ -347,6 +356,8 @@ class Income {
         'amount': amount,
         'allocations': allocations.map((a) => a.toJson()).toList(),
         'createdAt': createdAt,
+        'cutRoutine': cutRoutine,
+        'saveGoals': saveGoals,
       };
 
   factory Income.fromJson(Map<String, dynamic> json) {
@@ -368,6 +379,8 @@ class Income {
       amount: asDouble(json['amount']),
       allocations: allocations,
       createdAt: asInt(json['createdAt'], DateTime.now().millisecondsSinceEpoch),
+      cutRoutine: asBool(json['cutRoutine'], true),
+      saveGoals: asBool(json['saveGoals'], true),
     );
   }
 }
@@ -540,6 +553,75 @@ SalaryDeductions planDeductions({
   }
 
   return SalaryDeductions(allocations: allocations, goalAmounts: goalAmounts);
+}
+
+/// Menambahkan potongan yang terlewat ke gaji terbaru dalam bulan ini.
+///
+/// Dipanggil saat rutinitas/target baru dimasukkan atau diaktifkan, supaya
+/// gaji yang sudah dicatat sebelumnya ikut terpotong tanpa dicatat ulang.
+/// Idempoten: alokasi yang sudah ada tidak digandakan, dan gaji yang sakelar
+/// "Potong penyisihan"/"Sisihkan tabungan"-nya dimatikan saat dicatat tidak
+/// disentuh.
+void applyPendingSalaryDeductions(AppState state, {String? month}) {
+  final key = month ?? state.month;
+  final routines = state.routines.where((r) => r.active).toList();
+  final goals = state.goals
+      .where((g) => g.autoDeduct && !g.done && g.planAmount > 0)
+      .toList();
+  if (routines.isEmpty && goals.isEmpty) return;
+
+  Income? target;
+  for (final income in state.incomes) {
+    if (!inMonth(income.date, key)) continue;
+    if (target == null || income.createdAt > target.createdAt) {
+      target = income;
+    }
+  }
+  if (target == null) return;
+
+  if (target.cutRoutine) {
+    for (final routine in routines) {
+      final sudah = target.allocations
+          .any((a) => a.kind == 'rutin' && a.refId == routine.id);
+      if (sudah) continue;
+      final value = routine.monthly.roundToDouble();
+      if (value <= 0) continue;
+      target.allocations.add(
+        Allocation(
+          kind: 'rutin',
+          name: routine.name,
+          amount: value,
+          refId: routine.id,
+        ),
+      );
+    }
+  }
+
+  if (target.saveGoals) {
+    for (final goal in goals) {
+      final sudah = target.allocations
+          .any((a) => a.kind == 'tabungan' && a.refId == goal.id);
+      if (sudah) continue;
+      final value = goal.monthlyPlan.roundToDouble();
+      if (value <= 0) continue;
+      target.allocations.add(
+        Allocation(
+          kind: 'tabungan',
+          name: goal.name,
+          amount: value,
+          refId: goal.id,
+        ),
+      );
+      goal.deposits.add(
+        Deposit(
+          id: newId(),
+          date: target.date,
+          amount: value,
+          incomeId: target.id,
+        ),
+      );
+    }
+  }
 }
 
 class MonthTotals {

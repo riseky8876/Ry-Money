@@ -41,6 +41,7 @@ class TabunganScreen extends StatelessWidget {
 
   void _toggleAuto(BuildContext context, Goal goal, bool value) {
     goal.autoDeduct = value;
+    applyPendingSalaryDeductions(store.state);
     store.changed();
     showToast(
       context,
